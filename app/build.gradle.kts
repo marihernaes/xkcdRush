@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.hilt)
 }
 
 android {
@@ -37,6 +38,14 @@ android {
 
 dependencies {
 
+    implementation(libs.hiltAndroid)
+    implementation(libs.hiltAndroidCompiler)
+    implementation(libs.fragmentKtx)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.coil)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
