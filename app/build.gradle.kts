@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.hilt)
+    kotlin("kapt")
 }
 
 android {
@@ -39,7 +40,7 @@ android {
 dependencies {
 
     implementation(libs.hiltAndroid)
-    implementation(libs.hiltAndroidCompiler)
+    kapt(libs.hiltAndroidCompiler)
     implementation(libs.fragmentKtx)
     implementation(libs.retrofit)
     implementation(libs.converter.gson)
