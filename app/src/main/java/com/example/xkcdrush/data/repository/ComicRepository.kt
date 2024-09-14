@@ -9,9 +9,14 @@ import javax.inject.Inject
 class ComicRepository @Inject constructor(
     private val api: ComicApi
 ) {
-    suspend fun fetchCurrentComic(): Comic? {
-        val currentComic =  try {
-            api.getCurrentComic().let { comic ->
+
+    suspend fun fetchCurrentComic(): Comic? = fetchComic { api.getCurrentComic() }
+
+    suspend fun fetchComicById(id: Int): Comic? = fetchComic { api.getComicById(id) }
+
+    private suspend fun fetchComic(fetcher: suspend () -> Comic): Comic? {
+        return try {
+            fetcher().let { comic ->
                 if (comic.isValid()) {
                     comic
                 } else {
@@ -26,6 +31,5 @@ class ComicRepository @Inject constructor(
             Log.e("ComicRepository", "Error fetching comic: ${e.message}", e)
             null
         }
-        return currentComic
     }
 }

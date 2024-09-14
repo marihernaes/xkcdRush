@@ -10,6 +10,7 @@ import org.junit.After
 import org.junit.Test
 import org.junit.Assert.*
 import org.junit.Before
+import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
@@ -121,6 +122,46 @@ class ComicApiTest {
             fail("Expected a JsonSyntaxException to be thrown")
         } catch (e: MalformedJsonException) {
             // Test passes.
+        }
+    }
+
+    @Test
+    fun `fetchComicById returns expected comic for valid ID`() = runTest {
+        val validId = 2984
+        val jsonFile = File("src/test/java/com/example/xkcdrush/resources/xkcdValid2984.json")
+        val mockResponse = MockResponse()
+            .setResponseCode(200)
+            .setBody(jsonFile.readText(Charset.defaultCharset()))
+        mockWebServer.enqueue(mockResponse)
+
+        val actualComic = comicApi.getComicById(validId)
+
+        val expectedComic = Comic(
+            month = "9",
+            num = 2984,
+            year = "2024",
+            alt = "Their calculations show it will 'pass within the distance of the moon' but that it 'will not hit the moon, so what's the point?'",
+            img = "https://imgs.xkcd.com/comics/asteroid_news.png",
+            title = "Asteroid News",
+            day = "11"
+        )
+
+        assertEquals(expectedComic, actualComic)
+    }
+
+    @Test
+    fun `fetchComicById handles invalid ID`() = runTest {
+        val invalidId = 0
+        val mockResponse = MockResponse()
+            .setResponseCode(404)
+            .setBody("{\"error\":\"Comic not found\"}")
+        mockWebServer.enqueue(mockResponse)
+
+        try {
+            comicApi.getComicById(invalidId)
+            fail("Expected an HttpException to be thrown")
+        } catch (e: HttpException) {
+            assertEquals(404, e.code())
         }
     }
 }

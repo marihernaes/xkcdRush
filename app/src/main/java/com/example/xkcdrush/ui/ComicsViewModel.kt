@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.xkcdrush.data.model.Comic
+import com.example.xkcdrush.domain.GetComicByIdUseCase
 import com.example.xkcdrush.domain.GetCurrentComicUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -18,7 +19,8 @@ sealed class ComicState {
 
 @HiltViewModel
 class ComicsViewModel @Inject constructor(
-    private val getCurrentComicUseCase: GetCurrentComicUseCase
+    private val getCurrentComicUseCase: GetCurrentComicUseCase,
+    private val getComicByIdUseCase: GetComicByIdUseCase,
 ) : ViewModel() {
 
     private val _comicState = MutableLiveData<ComicState>()
@@ -28,11 +30,15 @@ class ComicsViewModel @Inject constructor(
         loadCurrentComic()
     }
 
-    fun loadCurrentComic() {
+    fun loadCurrentComic() = loadComic { getCurrentComicUseCase.invoke() }
+
+    fun loadComicById(id: Int) = loadComic { getComicByIdUseCase.invoke(id) }
+
+    private fun loadComic(loadComic: suspend () -> Comic?) {
         _comicState.value = ComicState.Loading
         viewModelScope.launch {
             try {
-                val comic = getCurrentComicUseCase.invoke()
+                val comic = loadComic()
                 if (comic == null) {
                     _comicState.value = ComicState.Error("Comic is null")
                 } else {
@@ -43,4 +49,5 @@ class ComicsViewModel @Inject constructor(
             }
         }
     }
+
 }
