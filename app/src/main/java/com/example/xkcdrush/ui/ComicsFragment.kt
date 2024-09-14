@@ -47,6 +47,5 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
                 true
             }
         }
-        viewModel.loadCurrentComic()
     }
 }
