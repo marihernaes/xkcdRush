@@ -7,7 +7,7 @@ import javax.inject.Inject
 class GetCurrentComicUseCase @Inject constructor(
     private val repository: ComicRepository
 ) {
-    suspend operator fun invoke(): Comic {
+    suspend operator fun invoke(): Comic? {
         return repository.fetchCurrentComic()
     }
 }
