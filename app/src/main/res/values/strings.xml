@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">xkcdRush</string>
+    <string name="comic_image_default_description">The comic is or will be displayed here.</string>
 </resources>
