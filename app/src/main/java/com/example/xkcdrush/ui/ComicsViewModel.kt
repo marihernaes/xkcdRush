@@ -10,7 +10,6 @@ import com.example.xkcdrush.domain.GetCurrentComicUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.math.max
 
 sealed class ComicState {
     data object Loading : ComicState()
@@ -28,26 +27,33 @@ class ComicsViewModel @Inject constructor(
     val comicState: LiveData<ComicState> = _comicState
 
     private var currentComicNum: Int? = null
+    private var newestComicNumToday: Int = 2985
 
-    init {
-        loadCurrentComic()
+    fun loadCurrentComic() = loadComic { getCurrentComicUseCase.invoke() }
+
+    fun loadPreviousComic() =
+        currentComicNum?.let { id -> loadComicById(maxOf(1, id - 1)) }
+
+    fun loadNextComic() =
+        currentComicNum?.let { id -> loadComicById(id + if (isNewestComicDisplayed()) 0 else 1) }
+
+    fun loadRandomComic() {
+        val num = (1..newestComicNumToday).random()
+        loadComicById(num)
     }
 
-    private fun loadCurrentComic() = loadComic { getCurrentComicUseCase.invoke() }
+    fun isNewestComicDisplayed(): Boolean =
+        currentComicNum?.let { it >= newestComicNumToday } ?: true
 
-    fun loadPreviousComic() {
-        currentComicNum?.let { id ->
-            loadComicById(max(1, id - 1))
+    fun isOldestComicDisplayed(): Boolean =
+        currentComicNum?.let { it == 1 } ?: false
+
+    private fun loadComicById(id: Int) {
+        if (!isComicLoading()) {
+            currentComicNum = id
+            loadComic { getComicByIdUseCase.invoke(id) }
         }
     }
-
-    fun loadNextComic() {
-        currentComicNum?.let { id ->
-            loadComicById(id + 1)
-        }
-    }
-
-    private fun loadComicById(id: Int) = loadComic { getComicByIdUseCase.invoke(id) }
 
     private fun loadComic(loadComic: suspend () -> Comic?) {
         _comicState.value = ComicState.Loading
@@ -59,6 +65,7 @@ class ComicsViewModel @Inject constructor(
                 } else {
                     _comicState.value = ComicState.Success(comic)
                     currentComicNum = comic.num
+                    newestComicNumToday = maxOf(newestComicNumToday, comic.num)
                 }
             } catch (e: Exception) {
                 _comicState.value = ComicState.Error("Failed to load comic: ${e.message}")
@@ -66,4 +73,7 @@ class ComicsViewModel @Inject constructor(
         }
     }
 
+    private fun isComicLoading(): Boolean {
+        return _comicState.value is ComicState.Loading
+    }
 }

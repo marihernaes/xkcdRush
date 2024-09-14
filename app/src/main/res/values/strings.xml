@@ -3,4 +3,5 @@
     <string name="comic_image_default_description">The comic is or will be displayed here.</string>
     <string name="load_next_comic">Next Comic</string>
     <string name="load_previous_comic">Previous Comic</string>
+    <string name="load_random_comic">Surprise me!</string>
 </resources>

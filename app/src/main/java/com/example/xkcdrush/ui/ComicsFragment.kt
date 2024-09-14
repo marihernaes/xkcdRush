@@ -30,15 +30,23 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
             viewModel.loadPreviousComic()
         }
 
+        binding.loadRandomButton.setOnClickListener {
+            viewModel.loadRandomComic()
+        }
+
         viewModel.comicState.observe(viewLifecycleOwner) { comicState ->
             val imageView: ImageView = view.findViewById(R.id.imageView)
             var altText = ""
             when (comicState) {
-                is ComicState.Error ->
+                is ComicState.Error -> {
                     imageView.load(R.drawable.error)
+                    updateButtonStates()
+                }
 
-                is ComicState.Loading ->
+                is ComicState.Loading -> {
+                    disableButtons()
                     imageView.load(R.drawable.placeholder)
+                }
 
                 is ComicState.Success -> {
                     imageView.load(comicState.comic.img) {
@@ -46,6 +54,7 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
                         error(R.drawable.error)
                     }
                     altText = comicState.comic.alt
+                    updateButtonStates()
                 }
             }
             binding.imageView.setOnLongClickListener {
@@ -55,5 +64,20 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
                 true
             }
         }
+
+        viewModel.loadCurrentComic()
+        updateButtonStates()
+    }
+
+    private fun updateButtonStates() {
+        binding.loadNextButton.isEnabled = !viewModel.isNewestComicDisplayed()
+        binding.loadPreviousButton.isEnabled = !viewModel.isOldestComicDisplayed()
+        binding.loadRandomButton.isEnabled = true
+    }
+
+    private fun disableButtons() {
+        binding.loadNextButton.isEnabled = false
+        binding.loadPreviousButton.isEnabled = false
+        binding.loadRandomButton.isEnabled = false
     }
 }
