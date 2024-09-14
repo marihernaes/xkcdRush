@@ -10,6 +10,7 @@ import com.example.xkcdrush.domain.GetCurrentComicUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.max
 
 sealed class ComicState {
     data object Loading : ComicState()
@@ -26,13 +27,27 @@ class ComicsViewModel @Inject constructor(
     private val _comicState = MutableLiveData<ComicState>()
     val comicState: LiveData<ComicState> = _comicState
 
+    private var currentComicNum: Int? = null
+
     init {
         loadCurrentComic()
     }
 
-    fun loadCurrentComic() = loadComic { getCurrentComicUseCase.invoke() }
+    private fun loadCurrentComic() = loadComic { getCurrentComicUseCase.invoke() }
 
-    fun loadComicById(id: Int) = loadComic { getComicByIdUseCase.invoke(id) }
+    fun loadPreviousComic() {
+        currentComicNum?.let { id ->
+            loadComicById(max(1, id - 1))
+        }
+    }
+
+    fun loadNextComic() {
+        currentComicNum?.let { id ->
+            loadComicById(id + 1)
+        }
+    }
+
+    private fun loadComicById(id: Int) = loadComic { getComicByIdUseCase.invoke(id) }
 
     private fun loadComic(loadComic: suspend () -> Comic?) {
         _comicState.value = ComicState.Loading
@@ -43,6 +58,7 @@ class ComicsViewModel @Inject constructor(
                     _comicState.value = ComicState.Error("Comic is null")
                 } else {
                     _comicState.value = ComicState.Success(comic)
+                    currentComicNum = comic.num
                 }
             } catch (e: Exception) {
                 _comicState.value = ComicState.Error("Failed to load comic: ${e.message}")

@@ -22,6 +22,14 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
 
         binding = FragmentComicsBinding.bind(view)
 
+        binding.loadNextButton.setOnClickListener {
+            viewModel.loadNextComic()
+        }
+
+        binding.loadPreviousButton.setOnClickListener {
+            viewModel.loadPreviousComic()
+        }
+
         viewModel.comicState.observe(viewLifecycleOwner) { comicState ->
             val imageView: ImageView = view.findViewById(R.id.imageView)
             var altText = ""
@@ -41,7 +49,7 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
                 }
             }
             binding.imageView.setOnLongClickListener {
-                Snackbar.make(binding.imageView, altText, Snackbar.LENGTH_INDEFINITE)
+                Snackbar.make(binding.imageView, altText, Snackbar.LENGTH_LONG)
                     .setTextMaxLines(20)
                     .show()
                 true
