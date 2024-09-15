@@ -71,7 +71,7 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
                         alt = comic.alt
                         defaultCalendar.set(
                             comic.year.toInt(),
-                            comic.month.toInt(),
+                            comic.month.toInt() - 1,
                             comic.day.toInt()
                         )
                         subtitle = defaultTimeFormat.format(defaultCalendar.time)
