@@ -98,11 +98,13 @@ class ComicsFragment : Fragment(R.layout.fragment_comics) {
         binding.loadNextButton.isEnabled = !viewModel.isNewestComicDisplayed()
         binding.loadPreviousButton.isEnabled = !viewModel.isOldestComicDisplayed()
         binding.loadRandomButton.isEnabled = true
+        binding.loadNewestButton.isEnabled = !viewModel.isNewestComicDisplayed()
     }
 
     private fun disableButtons() {
         binding.loadNextButton.isEnabled = false
         binding.loadPreviousButton.isEnabled = false
         binding.loadRandomButton.isEnabled = false
+        binding.loadNewestButton.isEnabled = false
     }
 }

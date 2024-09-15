@@ -42,6 +42,8 @@ class ComicsViewModel @Inject constructor(
         loadComicById(num)
     }
 
+    fun loadNewestComic() = loadComicById(newestComicNumToday)
+
     fun isNewestComicDisplayed(): Boolean =
         currentComicNum?.let { it >= newestComicNumToday } ?: true
 
